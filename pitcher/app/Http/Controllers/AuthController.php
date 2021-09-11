@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facedes\Hash;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -31,5 +32,37 @@ class AuthController extends Controller
         ];
 
         return response($response, 201);
+    }
+
+    public function login(Request $request) {
+        $validate = $request->validate([
+            'login' => 'required|string|exists:users,login|max:21|min:3',
+            'password' => 'required|string|min:6'
+        ]);
+
+        $user = User::where('login', $validate['login'])->first();
+
+        if(!$user || !Hash::check($validate['password'], $user->password)) {
+            return response([
+                'message' => 'Incorrect Login or Password, Try Again!'
+            ], 401);
+        }
+
+        $token = $user->createToken('mypitchertoken')->plainTextToken;
+
+        $response = [
+            'user' => $user,
+            'token' => $token
+        ];
+
+        return response($response, 201);
+    }
+
+    public function logout(Request $request) {
+        Auth::logout();
+
+        return [
+            'message' => 'Logged out!'
+        ];
     }
 }
