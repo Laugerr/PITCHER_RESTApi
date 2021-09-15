@@ -5,6 +5,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\Auth\Events\PasswordReset;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -27,6 +30,7 @@ class AuthController extends Controller
         $token = $user->createToken('mypitchertoken')->plainTextToken;
 
         $response = [
+            '' => '============Account Created Successfully !============',
             'user' => $user,
             'token' => $token
         ];
@@ -64,5 +68,42 @@ class AuthController extends Controller
         return [
             'message' => 'Logged out!'
         ];
+    }
+
+    public function passwordReset(Request $request) {
+        $request->validate(['email' => 'required|exists:users,email|email']);
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+                ? (['status' => __($status)])
+                : (['email' => __($status)]);
+    }
+
+    public function resetNewPassword(Request $request) {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string|confirmed|min:6',
+        ]);
+    
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+    
+                $user->save();
+    
+                event(new PasswordReset($user));
+            }
+        );
+    
+        return $status === Password::PASSWORD_RESET
+                ? (['status' => __($status)])
+                : (['email' => __($status)]);
     }
 }
