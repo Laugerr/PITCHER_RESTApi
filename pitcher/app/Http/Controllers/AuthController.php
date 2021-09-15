@@ -50,6 +50,9 @@ class AuthController extends Controller
             return response([
                 'message' => 'Incorrect Login or Password, Try Again!'
             ], 401);
+        }elseif(Auth::attempt($validate)){
+            $request->session()->regenerate();
+            return  Auth::user();
         }
 
         $token = $user->createToken('mypitchertoken')->plainTextToken;
@@ -60,6 +63,8 @@ class AuthController extends Controller
         ];
 
         return response($response, 201);
+
+
     }
 
     public function logout(Request $request) {
