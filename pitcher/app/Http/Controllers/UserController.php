@@ -27,7 +27,7 @@ class UserController extends Controller
             if (Cache::has('is_online' . $user->id))
                 echo $user->role . " " . $user->full_name . " is online.\r\n";
             else
-                echo $user->role . " " . $user->full_name . " is offline. Last seen" . $user->last_seen . "\r\n";
+                echo $user->role . " " . $user->full_name . " is offline. Last seen " . $user->last_seen . "\r\n";
         }
     }
 
