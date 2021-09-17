@@ -48,4 +48,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'last_seen' => 'datetime',
     ];
+
+    protected $dates = [
+        'last_seen',
+    ];
 }
