@@ -28,8 +28,11 @@ Route::post('auth/password-reset/{token}',[AuthController::class, 'resetNewPassw
 
 // ========================= USER MODULE ======================
 
+Route::get('users/profile', [UserController::class, 'profile']);
+Route::get('users', [UserController::class, 'index'])->middleware('auth:sanctum');
+Route::get('users/checkstatus', [UserController::class, 'userOnlineStatus'])->middleware('auth:sanctum');
+Route::post('users', [UserController::class, 'store']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    Route::get('users/profile', [UserController::class, 'profile']);
-    Route::get('users', [UserController::class, 'index']);
-    Route::get('users/checkstatus', [UserController::class, 'userOnlineStatus'])->middleware('auth:sanctum');
+    return $request->user();
 });
