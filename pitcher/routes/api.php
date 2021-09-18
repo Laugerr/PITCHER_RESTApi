@@ -21,7 +21,7 @@ use App\Models\User;
 
 Route::post('auth/register', [AuthController::class , 'register']);
 Route::post('auth/login', [AuthController::class , 'login']);
-Route::post('auth/logout', [AuthController::class , 'logout'])->middleware('auth:sanctum');
+Route::post('auth/logout', [AuthController::class , 'logout']);
 Route::post('auth/password-reset',[AuthController::class, 'passwordReset'])->name('password.reset');
 Route::post('auth/password-reset/{token}',[AuthController::class, 'resetNewPassword']);
 

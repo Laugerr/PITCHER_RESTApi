@@ -68,12 +68,18 @@ class AuthController extends Controller
     }
 
     public function logout(Request $request) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return [
-            'message' => 'Logged out!'
-        ];
+        $user = Auth::user();
+
+        if($user){
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return ['message' => 'Logged out!'];
+        }
+
+        else{
+            return response(['message' => 'Not logged in. Login first!'], 404);
+        }
     }
 
     public function passwordReset(Request $request) {
