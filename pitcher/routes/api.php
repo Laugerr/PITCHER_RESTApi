@@ -21,7 +21,7 @@ use App\Models\User;
 
 Route::post('auth/register', [AuthController::class , 'register']);
 Route::post('auth/login', [AuthController::class , 'login']);
-Route::post('auth/logout', [AuthController::class , 'logout']);
+Route::post('auth/logout', [AuthController::class , 'logout'])->middleware('auth:sanctum');
 Route::post('auth/password-reset',[AuthController::class, 'passwordReset'])->name('password.reset');
 Route::post('auth/password-reset/{token}',[AuthController::class, 'resetNewPassword']);
 
@@ -31,7 +31,7 @@ Route::post('auth/password-reset/{token}',[AuthController::class, 'resetNewPassw
 Route::get('users/profile', [UserController::class, 'profile']);
 Route::get('users', [UserController::class, 'index'])->middleware('auth:sanctum');
 Route::get('users/checkstatus', [UserController::class, 'userOnlineStatus'])->middleware('auth:sanctum');
-Route::post('users', [UserController::class, 'store']);
+Route::post('users', [UserController::class, 'store'])->middleware('admin');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
