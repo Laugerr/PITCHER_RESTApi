@@ -30,6 +30,10 @@ class UserController extends Controller
         }
     }
 
+    public function show($id) {
+        return User::find($id);
+    }
+
     public function userOnlineStatus()
     {
         $users = DB::table('users')->get();
@@ -80,7 +84,7 @@ class UserController extends Controller
 
     public function avatar_create(Request $request) {
         $validate = $request->validate([
-            'profile_picture' => 'nullable|image|mimes:png|max:4096'
+            'profile_picture' => 'sometimes|image|mimes:png|max:4096'
         ]);
 
         $user = Auth::user();
@@ -97,5 +101,15 @@ class UserController extends Controller
         return response([
             'message' => 'Account updated successfully'
         ], 201);
+    }
+
+    public function deleteUser($id)
+    {
+        if(User::find($id)){
+            User::destroy($id);
+            return response(['message' => 'User deleted!'], 201);
+        }else{
+            return ['Alert' => 'User not found!'];
+        }
     }
 }

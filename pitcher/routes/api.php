@@ -31,8 +31,12 @@ Route::post('auth/password-reset/{token}',[AuthController::class, 'resetNewPassw
 Route::get('users/profile', [UserController::class, 'profile']);
 Route::get('users', [UserController::class, 'index'])->middleware('auth:sanctum');
 Route::get('users/checkstatus', [UserController::class, 'userOnlineStatus'])->middleware('auth:sanctum');
+Route::get('users/{id}', [UserController::class, 'show'])->middleware('auth:sanctum');
 Route::post('users', [UserController::class, 'store'])->middleware('admin');
 Route::post('users/avatar', [UserController::class, 'avatar_create'])->middleware('auth:sanctum');
+Route::delete('users/{id}', [UserController::class, 'deleteUser'])->middleware('admin');
+
+//========================= POST MODULE ======================
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
