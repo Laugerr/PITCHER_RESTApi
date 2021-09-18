@@ -32,6 +32,7 @@ Route::get('users/profile', [UserController::class, 'profile']);
 Route::get('users', [UserController::class, 'index'])->middleware('auth:sanctum');
 Route::get('users/checkstatus', [UserController::class, 'userOnlineStatus'])->middleware('auth:sanctum');
 Route::post('users', [UserController::class, 'store'])->middleware('admin');
+Route::post('users/avatar', [UserController::class, 'avatar_create'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

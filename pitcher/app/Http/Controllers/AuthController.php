@@ -24,6 +24,7 @@ class AuthController extends Controller
             'login' => $validate['login'],
             'full_name' => $validate['full_name'],
             'email' => $validate['email'],
+            'profile_picture' => '/images/defaultProfile.png',
             'password' => bcrypt($validate['password'])
         ]);
 

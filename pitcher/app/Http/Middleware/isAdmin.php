@@ -19,11 +19,14 @@ class isAdmin
     public function handle(Request $request, Closure $next)
     {
         $user = Auth::user();
-
+        if (empty($user)) {
+            return response([ 'Alert' => 'You\'re not logged in!'], 403);}
         if($user['role'] === 'Admin'){
             return $next($request);
         }
         
-        return response([ 'Alert' => 'Creation of a new user is denied. You should be an Admin!'], 403);
+        return response([ 'Alert' => 'Denied. You should be an Admin!'], 403);
+
+        
     }
 }
