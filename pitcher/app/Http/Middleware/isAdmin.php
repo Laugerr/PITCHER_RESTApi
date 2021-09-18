@@ -24,6 +24,6 @@ class isAdmin
             return $next($request);
         }
         
-        return response([ 'Alert' => 'Access is denied']);
+        return response([ 'Alert' => 'Creation of a new user is denied. You should be an Admin!'], 403);
     }
 }
