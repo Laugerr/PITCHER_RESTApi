@@ -3,35 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+class Comment extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'title',
+        'post_id',
         'content',
-        'categories',
     ];
 
     protected $casts = [
-        'title' => 'string',
-        'content' => 'string'
+        'content' => 'string',
     ];
 
     public function user() {
         return $this->belongsTo(User::class);
     }
 
-    public function categories() {
-        return $this->belongsToMany(Category::class);
-    }
-
-    public function comments() {
-        return $this->hasMany(Comment::class);
+    public function post() {
+        return $this->belongsTo(Post::class);
     }
 
     public function likes() {
