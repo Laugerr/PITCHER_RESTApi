@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostController;
 use App\Models\User;
 
 /*
@@ -29,7 +30,7 @@ Route::post('auth/password-reset/{token}',[AuthController::class, 'resetNewPassw
 // ========================= USER MODULE ======================
 
 Route::get('users/profile', [UserController::class, 'profile']);
-Route::get('users', [UserController::class, 'index'])->middleware('auth:sanctum');
+Route::get('users', [UserController::class, 'index'])->middleware('admin');
 Route::get('users/checkstatus', [UserController::class, 'userOnlineStatus'])->middleware('auth:sanctum');
 Route::get('users/{id}', [UserController::class, 'show'])->middleware('auth:sanctum');
 Route::post('users', [UserController::class, 'store'])->middleware('admin');
@@ -37,6 +38,8 @@ Route::post('users/avatar', [UserController::class, 'avatar_create'])->middlewar
 Route::delete('users/{id}', [UserController::class, 'deleteUser'])->middleware('admin');
 
 //========================= POST MODULE ======================
+
+Route::get('posts', [PostController::class, 'index'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
