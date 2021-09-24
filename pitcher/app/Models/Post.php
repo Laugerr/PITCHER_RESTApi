@@ -19,7 +19,8 @@ class Post extends Model
 
     protected $casts = [
         'title' => 'string',
-        'content' => 'string',
-        'status' => 'enum',
+        'content' => 'string'
     ];
+
+    
 }

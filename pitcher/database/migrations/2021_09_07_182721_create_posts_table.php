@@ -17,10 +17,10 @@ class CreatePostsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id'); //author
             $table->string('title');
-            $table->timestamps();
             $table->enum('status', ['active','inactive'])->default('active');
-            $table->string('content');
-            $table->string('categories');
+            $table->string('content', 8000);
+            $table->string('categories')->nullable();
+            $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });
     }
