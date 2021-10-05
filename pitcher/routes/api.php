@@ -44,6 +44,10 @@ Route::get('posts/{id}', [PostController::class, 'show'])->middleware('auth:sanc
 Route::post('posts/', [PostController::class, 'create'])->middleware('auth:sanctum');
 Route::post('posts/{id}/comments', [PostController::class, 'commentCreate'])->middleware('auth:sanctum');
 Route::get('posts/{id}/comments', [PostController::class, 'indexComment'])->middleware('auth:sanctum');
+Route::patch('posts/{id}', [PostController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('posts/{id}', [PostController::class, 'destroy'])->middleware('auth:sanctum');
+
+//====================== CATEGORY MODULE ======================
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

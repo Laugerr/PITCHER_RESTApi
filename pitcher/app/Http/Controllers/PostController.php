@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
+use DB;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -88,9 +89,9 @@ class PostController extends Controller
             return response(['message' => 'No comment yet. Be the first one to comment!'], 201);
         }
 
-        return [
+        return response([
             "============POST============", $post,
-            "============COMMENTS============",$comment->get()];
+            "============COMMENTS============",$comment->get()]);
     }
 
     /**
@@ -133,9 +134,28 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request,int $id)
     {
-        //
+        $user = Auth::id();
+        $post = Post::find($id);
+
+        if (!isset($post)){
+            return response(['Alert' => 'Post not found!'], 404);
+        }
+
+        $validate = $request->validate([
+            'title' => 'string|max:60|min:3',
+            'content' => 'string|max:8000',
+            'categories' => 'nullable|array',
+        ]);
+
+        if($post->user_id != $user){
+            return response(['Alert' => 'You\'re not the Author to update the post.']);
+        }
+
+        $post->update($validate);
+
+        return response(['message' => 'Post updated successfully'], 201);
     }
 
     /**
@@ -144,8 +164,20 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Post $post)
+    public function destroy(Post $post, $id)
     {
-        //
+        $user = Auth::id();
+        $post = Post::find($id);
+
+        if (!isset($post)){
+            return response(['Alert' => 'Post not found!'], 404);
+        }
+
+        if($post->user_id != $user) {
+            return response(['Alert' => 'You\'re not the Author to delete the post.']);
+        }
+
+        Post::destroy($id);
+        return response(['Message' => 'Post deleted successfully!'], 201);
     }
 }
