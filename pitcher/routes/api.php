@@ -40,7 +40,11 @@ Route::delete('users/{id}', [UserController::class, 'deleteUser'])->middleware('
 //========================= POST MODULE ======================
 
 Route::get('posts', [PostController::class, 'index'])->middleware('auth:sanctum');
+Route::get('posts/{id}', [PostController::class, 'show'])->middleware('auth:sanctum');
 Route::post('posts/', [PostController::class, 'create'])->middleware('auth:sanctum');
+Route::post('posts/{id}/comments', [PostController::class, 'commentCreate'])->middleware('auth:sanctum');
+Route::get('posts/{id}/comments', [PostController::class, 'indexComment'])->middleware('auth:sanctum');
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

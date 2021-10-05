@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -17,7 +18,7 @@ class PostController extends Controller
     public function index()
     {
         $post = Post::all();
-        if(empty($post)){
+        if(!(Post::exists())){
             return response(['No post created yet. Create One!'], 403);
         };
         return $post;
@@ -54,6 +55,44 @@ class PostController extends Controller
         };
     }
 
+    public function commentCreate(Request $request, int $id) {
+        $post = Post::find($id);
+
+        $validate = $request->validate([
+            'content' => 'required|string|max:1800|min:0'
+        ]);
+
+        if (!isset($post)){
+            return response(['Alert' => 'Post not found!'], 404);
+        }
+
+        $comment = Comment::create([
+            'user_id' => Auth::id(),
+            'post_id' => $id,
+            'content' => $validate['content'],
+        ]);
+
+        return response(['message' => 'You created a Comment!'], 201);
+    }
+
+    public function indexComment($id) {
+        $post = Post::find($id);
+
+        if (!isset($post)){
+            return response(['Alert' => 'Post not found!'], 404);
+        }
+
+        $comment = Comment::where('post_id', '=', $id);
+
+        if(!isset($comment)){
+            return response(['message' => 'No comment yet. Be the first one to comment!'], 201);
+        }
+
+        return [
+            "============POST============", $post,
+            "============COMMENTS============",$comment->get()];
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -71,9 +110,9 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post)
+    public function show($id)
     {
-        //
+        return Post::find($id);
     }
 
     /**
