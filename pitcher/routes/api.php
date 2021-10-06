@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CategoryController;
 use App\Models\User;
 
 /*
@@ -49,6 +50,12 @@ Route::delete('posts/{id}', [PostController::class, 'destroy'])->middleware('aut
 
 //====================== CATEGORY MODULE ======================
 
+Route::post('/categories', [CategoryController::class, 'create'])->middleware('auth:sanctum');
+Route::get('/categories', [CategoryController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/categories/{id}', [CategoryController::class, 'show'])->middleware('auth:sanctum');
+Route::get('/categories/{id}/posts', [CategoryController::class, 'postsByCategory'])->middleware('auth:sanctum');
+Route::patch('/categories/{id}', [CategoryController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -14,7 +15,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        return Category::all();
     }
 
     /**
@@ -22,9 +23,38 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'title' => 'required|string|unique:categories,title|min:3|max:256',
+            'description' => 'nullable|string|max:1400',
+        ]);
+
+        $category = Category::create([
+            'title' => $validate['title'],
+            'description' => $validate['description'],
+        ]);
+
+        $response = ['============New Category Created!============', $category];
+        return response($response, 201);
+    }
+
+    public function postsByCategory($id)
+    {
+        $posts = Post::all();
+        $category = Category::find($id);
+
+        if($category){
+            $res = [];
+            foreach($posts as $post){
+                if(str_contains(strtoupper($post->categories), strtoupper($category->title))){
+                    array_push($res, $post);
+                }
+            }
+            return $res;
+        }else{
+            return response(['Alert' => 'Invalid Category!']);
+        }
     }
 
     /**
@@ -44,9 +74,15 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function show(Category $category)
+    public function show($id)
     {
-        //
+        $category = Category::find($id);
+
+        if(!isset($category)){
+            return response(['error' => 'Category not found!'], 404);
+        }
+
+        return $category;
     }
 
     /**
@@ -67,9 +103,22 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request,int $id)
     {
-        //
+        $category = Category::find($id);
+
+        if (!isset($category)){
+            return response(['Alert' => 'Post not found!'], 404);
+        }
+
+        $validate = $request->validate([
+            'title' => 'string|unique:categories,title|min:3|max:256',
+            'description' => 'nullable|string|max:1400',
+        ]);
+
+        $category->update($validate);
+
+        return response(['message' => 'Category updated successfully'], 201);
     }
 
     /**
@@ -78,8 +127,15 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category, $id)
     {
-        //
+        $category = Category::find($id);
+
+        if (!isset($category)){
+            return response(['Alert' => 'Post not found!'], 404);
+        }
+
+        Category::destroy($id);
+        return response(['Message' => 'Category deleted successfully!'], 201);
     }
 }
