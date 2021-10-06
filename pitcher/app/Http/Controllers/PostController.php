@@ -18,11 +18,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        $post = Post::all();
+        $post = DB::table('posts');
         if(!(Post::exists())){
             return response(['No post created yet. Create One!'], 403);
         };
-        return $post;
+        return $post->paginate(10);
     }
 
     /**
@@ -36,13 +36,14 @@ class PostController extends Controller
         $validate = $request->validate([
             'title' => 'required|string|max:60|min:3',
             'content' => 'required|string|max:8000',
-            'categories' => 'nullable|array',
+            'categories' => 'array|exists:categories,title',
         ]);
 
         $post = Post::create([
             'user_id' => Auth::id(),
             'title' => $validate['title'],
             'content' => $validate['content'],
+            'categories' => Implode(', ', $validate['categories']),
         ]);
 
         $response = [
@@ -113,7 +114,13 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        return Post::find($id);
+        $post = Post::find($id);
+
+        if(!isset($post)){
+            return response(['error' => 'Post not found!'], 404);
+        }
+
+        return $post;
     }
 
     /**
