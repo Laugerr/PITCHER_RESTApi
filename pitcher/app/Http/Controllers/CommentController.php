@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\Comment;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -44,9 +46,15 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function show(Comment $comment)
+    public function show($id)
     {
-        //
+        $comment = Comment::find($id);
+
+        if(!isset($comment)){
+            return response(['error' => 'Comment not found!'], 404);
+        }
+
+        return $comment;
     }
 
     /**
@@ -67,9 +75,26 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Comment $comment)
+    public function update(Request $request,int $id)
     {
-        //
+        $user = Auth::id();
+        $comment = Post::find($id);
+
+        if (!isset($comment)){
+            return response(['Alert' => 'Post not found!'], 404);
+        }
+
+        $validate = $request->validate([
+            'content' => 'string|max:1800|min:0'
+        ]);
+
+        if($comment->user_id != $user){
+            return response(['Alert' => 'You\'re not the Author to update the comment.']);
+        }
+
+        $comment->update($validate);
+
+        return response(['message' => 'Comment updated successfully'], 201);
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommentController;
 use App\Models\User;
 
 /*
@@ -56,6 +57,12 @@ Route::get('/categories/{id}', [CategoryController::class, 'show'])->middleware(
 Route::get('/categories/{id}/posts', [CategoryController::class, 'postsByCategory'])->middleware('auth:sanctum');
 Route::patch('/categories/{id}', [CategoryController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->middleware('auth:sanctum');
+
+//====================== COMMENT MODULE ======================
+
+Route::get('/comments/{id}', [CommentController::class, 'show'])->middleware('auth:sanctum');
+Route::patch('/comments/{id}', [CommentController::class, 'update'])->middleware('auth:sanctum');
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
