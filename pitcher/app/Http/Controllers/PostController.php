@@ -6,8 +6,11 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
+use App\Models\Like;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
 
 class PostController extends Controller
 {
@@ -95,17 +98,63 @@ class PostController extends Controller
             "============COMMENTS============",$comment->get()]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function store_likes(Request $request, int $id) 
     {
+        $user = Auth::user();
+        $user = User::find($user->id);
+        $post = Post::find($id);
+
+        if (!isset($post)) {
+            return response(['error' => 'Post not found!'], 403);
+        }
+
+        $validate = $request->validate([
+            'type' => 'required|in:like,dislike'
+        ]);
+
+        $likecheck = Like::where('user_id', $user->id)->where('post_id', $post->id)->first();
+
+        if (empty($likecheck)) {
+            $like = new Like();
+            $like->type = $validate['type'];
+
+            if ($validate['type'] === 'like') {
+                Post::where('id', $id)->increment('rating', 1);
+                $like->user()->associate($user)->post()->associate($post)->save();
+                return response(['message' => 'Post liked'], 201);
+            } elseif(($validate['type'] === 'dislike')) {
+                Post::where('id', $id)->decrement('rating', 1);
+                $like->user()->associate($user)->post()->associate($post)->save();
+                return response(['message' => 'Post disliked'], 201);
+            }
+        }
+
+        $likecheck->type = $validate['type'];
+        $likecheck->save();
+
         
+        if ($validate['type'] === 'like') {
+            if ($likecheck->type == 'dislike') {
+                Post::where('id', $id)->increment('rating', 2);
+                return response(['message' => 'Post liked'], 201);
+            }elseif ($likecheck->type == 'like'){
+                return response(['message' => 'Post already liked'], 201);
+            }
+        } elseif($validate['type'] === 'dislike'){
+            if($likecheck->type == 'like'){
+                Post::where('id', $id)->decrement('rating', 2);
+                return response(['message' => 'Post disliked'], 201);
+            }elseif($likecheck->type == 'dislike'){
+                return response(['message' => 'Post already disliked'], 201);
+            }
+        }else {
+            return response(['error' => 'Something went wrong!'], 404);
+        }$likecheck->update();
     }
 
+    public function deletePostLike() {
+
+    }
     /**
      * Display the specified resource.
      *

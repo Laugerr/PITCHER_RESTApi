@@ -48,6 +48,7 @@ Route::post('posts/{id}/comments', [PostController::class, 'commentCreate'])->mi
 Route::get('posts/{id}/comments', [PostController::class, 'indexComment'])->middleware('auth:sanctum');
 Route::patch('posts/{id}', [PostController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('posts/{id}', [PostController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('posts/{id}/like', [PostController::class, 'store_likes'])->middleware('auth:sanctum');
 
 //====================== CATEGORY MODULE ======================
 
