@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\Like;
+use App\Models\Category;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -98,15 +99,19 @@ class PostController extends Controller
             "============COMMENTS============",$comment->get()]);
     }
 
-    public function getPostLike() 
+    public function getPostLike($id) 
     {
-        $like = like::all();
-        
-        if (empty($like)) {
-            return response(['message' => 'No Likes for this post yet'], 201);
+        $post = Post::find($id);
+
+        if (!isset($post)){
+            return response(['Alert' => 'Post not found!'], 404);
         }
 
-        return response([$like],404);
+        $like = like::where('post_id', '=', $id);
+        
+        return response([
+            "============POST============", $post,
+            "============LIKES============",$like->get()]);
     }
 
     public function store_likes(Request $request, int $id) 
@@ -228,6 +233,24 @@ class PostController extends Controller
         $post->update($validate);
 
         return response(['message' => 'Post updated successfully'], 201);
+    }
+
+    public function postByCategory($id){
+        $posts = Post::all();
+        $category = Category::find($id);
+
+        if($category){
+            $res = [];
+            foreach($posts as $post){
+                if(str_contains(strtoupper($post->categories), strtoupper($category->title))){
+                    array_push($res, $post);
+                }
+            }
+            return $res;
+        }else{
+            return response(['error' => 'Category not found'], 404);
+        }
+            
     }
 
     /**

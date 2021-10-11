@@ -49,7 +49,7 @@ Route::get('posts/{id}/comments', [PostController::class, 'indexComment'])->midd
 Route::patch('posts/{id}', [PostController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('posts/{id}', [PostController::class, 'destroy'])->middleware('auth:sanctum');
 Route::post('posts/{id}/like', [PostController::class, 'store_likes'])->middleware('auth:sanctum');
-Route::post('posts/{id}/like', [PostController::class, 'store_likes'])->middleware('auth:sanctum');
+Route::get('posts/{id}/categories', [PostController::class, 'postByCategory'])->middleware('auth:sanctum');
 Route::delete('posts/{id}/like', [PostController::class, 'deletePostLike'])->middleware('auth:sanctum');
 Route::get('posts/{id}/like', [PostController::class, 'getPostLike'])->middleware('auth:sanctum');
 
@@ -66,6 +66,8 @@ Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->middl
 
 Route::get('/comments/{id}', [CommentController::class, 'show'])->middleware('auth:sanctum');
 Route::patch('/comments/{id}', [CommentController::class, 'update'])->middleware('auth:sanctum');
+Route::get('/comments/{id}/like', [CommentController::class, 'getCommentLike'])->middleware('auth:sanctum');
+Route::post('/comments/{id}/like', [CommentController::class, 'store_likes'])->middleware('auth:sanctum');
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
