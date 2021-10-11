@@ -134,17 +134,17 @@ class PostController extends Controller
 
         
         if ($validate['type'] === 'like') {
-            if ($likecheck->type == 'dislike') {
+            if ($likecheck->type === 'dislike') {
                 Post::where('id', $id)->increment('rating', 2);
                 return response(['message' => 'Post liked'], 201);
-            }elseif ($likecheck->type == 'like'){
+            }elseif ($likecheck->type = 'like'){
                 return response(['message' => 'Post already liked'], 201);
             }
         } elseif($validate['type'] === 'dislike'){
-            if($likecheck->type == 'like'){
+            if($likecheck->type === 'like'){
                 Post::where('id', $id)->decrement('rating', 2);
                 return response(['message' => 'Post disliked'], 201);
-            }elseif($likecheck->type == 'dislike'){
+            }elseif($likecheck->type = 'dislike'){
                 return response(['message' => 'Post already disliked'], 201);
             }
         }else {
@@ -152,7 +152,30 @@ class PostController extends Controller
         }$likecheck->update();
     }
 
-    public function deletePostLike() {
+    public function deletePostLike(Request $request, int $id) {
+        $user = Auth::user();
+        $user = User::find($user->id);
+        $post = Post::find($id);
+
+        if (!isset($post)) {
+            return response(['error' => 'Post not found!'], 403);
+        }
+
+        $likecheck = Like::where('user_id', $user->id)->where('post_id', $post->id)->first();
+        
+        if(empty($likecheck)){
+            return response(['Error' => 'Like doesn\'t exist.'], 201);
+        }
+        if($likecheck->type === 'like'){
+            Post::where('id', $id)->decrement('rating', 1);
+            Like::destroy($likecheck->id);
+            return response(['message' => 'Like deleted successfully!'], 201);
+        }
+        elseif ($likecheck->type === 'dislike'){
+            Post::where('id', $id)->increment('rating', 1);
+            Like::destroy($likecheck->id);
+            return response(['message' => 'Dislike deleted successfully!'], 201);
+        } 
 
     }
     /**
@@ -171,25 +194,7 @@ class PostController extends Controller
 
         return $post;
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Post $post)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
+    
     public function update(Request $request,int $id)
     {
         $user = Auth::id();
