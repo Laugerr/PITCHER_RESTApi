@@ -51,6 +51,7 @@ Route::delete('posts/{id}', [PostController::class, 'destroy'])->middleware('aut
 Route::post('posts/{id}/like', [PostController::class, 'store_likes'])->middleware('auth:sanctum');
 Route::post('posts/{id}/like', [PostController::class, 'store_likes'])->middleware('auth:sanctum');
 Route::delete('posts/{id}/like', [PostController::class, 'deletePostLike'])->middleware('auth:sanctum');
+Route::get('posts/{id}/like', [PostController::class, 'getPostLike'])->middleware('auth:sanctum');
 
 //====================== CATEGORY MODULE ======================
 

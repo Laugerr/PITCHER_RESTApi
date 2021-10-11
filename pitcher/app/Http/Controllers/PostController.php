@@ -23,7 +23,7 @@ class PostController extends Controller
     {
         $post = DB::table('posts');
         if(!(Post::exists())){
-            return response(['No post created yet. Create One!'], 403);
+            return response(['No post created yet. Create One!'], 404);
         };
         return $post->paginate(10);
     }
@@ -56,7 +56,7 @@ class PostController extends Controller
 
         return response($response, 201);}
         else{
-            return response(['You\'re not Logged in!'], 403);
+            return response(['You\'re not Logged in!'], 401);
         };
     }
 
@@ -90,12 +90,23 @@ class PostController extends Controller
         $comment = Comment::where('post_id', '=', $id);
 
         if(!isset($comment)){
-            return response(['message' => 'No comment yet. Be the first one to comment!'], 201);
+            return response(['message' => 'No comment yet. Be the first one to comment!'], 404);
         }
 
         return response([
             "============POST============", $post,
             "============COMMENTS============",$comment->get()]);
+    }
+
+    public function getPostLike() 
+    {
+        $like = like::all();
+        
+        if (empty($like)) {
+            return response(['message' => 'No Likes for this post yet'], 201);
+        }
+
+        return response([$like],404);
     }
 
     public function store_likes(Request $request, int $id) 
@@ -194,7 +205,7 @@ class PostController extends Controller
 
         return $post;
     }
-    
+
     public function update(Request $request,int $id)
     {
         $user = Auth::id();
