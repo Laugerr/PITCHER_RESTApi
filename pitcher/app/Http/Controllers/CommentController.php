@@ -59,27 +59,33 @@ class CommentController extends Controller
             }
         }
 
-        $likecheck->type = $validate['type'];
+        $previousType = $likecheck->type;
+        $newType = $validate['type'];
+
+        if ($previousType === $newType) {
+            if ($newType === 'like') {
+                return response(['message' => 'Comment already liked'], 200);
+            }
+
+            return response(['message' => 'Comment already disliked'], 200);
+        }
+
+        if ($previousType === 'dislike' && $newType === 'like') {
+            Comment::where('id', $id)->increment('rating', 2);
+        } elseif ($previousType === 'like' && $newType === 'dislike') {
+            Comment::where('id', $id)->decrement('rating', 2);
+        } else {
+            return response(['error' => 'Something went wrong!'], 404);
+        }
+
+        $likecheck->type = $newType;
         $likecheck->save();
 
-        
-        if ($validate['type'] === 'like') {
-            if ($likecheck->type === 'dislike') {
-                Comment::where('id', $id)->increment('rating', 2);
-                return response(['message' => 'Comment Liked'], 201);
-            }elseif ($likecheck->type = 'like'){
-                return response(['message' => 'Comment already liked'], 201);
-            }
-        } elseif($validate['type'] === 'dislike'){
-            if($likecheck->type === 'like'){
-                Comment::where('id', $id)->decrement('rating', 2);
-                return response(['message' => 'Comment disliked'], 201);
-            }elseif($likecheck->type = 'dislike'){
-                return response(['message' => 'Comment already disliked'], 201);
-            }
-        }else {
-            return response(['error' => 'Something went wrong!'], 404);
-        }$likecheck->update();
+        if ($newType === 'like') {
+            return response(['message' => 'Comment liked'], 200);
+        }
+
+        return response(['message' => 'Comment disliked'], 200);
     }
 
     /**
