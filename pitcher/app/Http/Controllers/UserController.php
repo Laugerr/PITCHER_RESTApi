@@ -37,16 +37,22 @@ class UserController extends Controller
     public function userOnlineStatus()
     {
         $users = DB::table('users')->get();
-        
-        foreach ($users as $user) {
-            $online = $user->full_name . " is Online\u{1F929}\r\n";
-            $offline = $user->full_name . " is Offline\u{1F634} | Last seen " . Carbon::parse($user->last_seen)->diffForHumans() . "\r\n";
 
-            if (Cache::has('is_online' . $user->id))
-                echo "\u{1F7E2} | " . $online;
-            else
-                echo "\u{1F534} | " .$offline;
-        }
+        $statuses = $users->map(function ($user) {
+            $isOnline = Cache::has('is_online' . $user->id);
+
+            return [
+                'id' => $user->id,
+                'full_name' => $user->full_name,
+                'is_online' => $isOnline,
+                'last_seen' => $user->last_seen,
+                'last_seen_human' => $user->last_seen ? Carbon::parse($user->last_seen)->diffForHumans() : null,
+            ];
+        });
+
+        return response([
+            'data' => $statuses,
+        ], 200);
     }
 
     public function store(Request $request) {

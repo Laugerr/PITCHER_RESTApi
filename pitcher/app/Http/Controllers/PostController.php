@@ -122,7 +122,7 @@ class PostController extends Controller
         $post = Post::find($id);
 
         if (!isset($post)) {
-            return response(['error' => 'Post not found!'], 403);
+            return response(['error' => 'Post not found!'], 404);
         }
 
         $validate = $request->validate([
@@ -181,24 +181,26 @@ class PostController extends Controller
         $post = Post::find($id);
 
         if (!isset($post)) {
-            return response(['error' => 'Post not found!'], 403);
+            return response(['error' => 'Post not found!'], 404);
         }
 
         $likecheck = Like::where('user_id', $user->id)->where('post_id', $post->id)->first();
         
         if(empty($likecheck)){
-            return response(['Error' => 'Like doesn\'t exist.'], 201);
+            return response(['error' => 'Like does not exist.'], 404);
         }
         if($likecheck->type === 'like'){
             Post::where('id', $id)->decrement('rating', 1);
             Like::destroy($likecheck->id);
-            return response(['message' => 'Like deleted successfully!'], 201);
+            return response(['message' => 'Like deleted successfully!'], 200);
         }
         elseif ($likecheck->type === 'dislike'){
             Post::where('id', $id)->increment('rating', 1);
             Like::destroy($likecheck->id);
-            return response(['message' => 'Dislike deleted successfully!'], 201);
+            return response(['message' => 'Dislike deleted successfully!'], 200);
         } 
+
+        return response(['error' => 'Invalid like type.'], 422);
 
     }
     /**
