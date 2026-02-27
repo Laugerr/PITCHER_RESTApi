@@ -51,10 +51,10 @@ class AuthController extends Controller
             return response([
                 'message' => 'Incorrect Login or Password, Try Again!'
             ], 401);
-        }elseif(Auth::attempt($validate)){
-            $request->session()->regenerate();
-            return  Auth::user();
         }
+
+        // API login should issue a Sanctum token instead of returning session auth user.
+        $user->tokens()->delete();
 
         $token = $user->createToken('mypitchertoken')->plainTextToken;
 
@@ -63,7 +63,7 @@ class AuthController extends Controller
             'token' => $token
         ];
 
-        return response($response, 201);
+        return response($response, 200);
 
 
     }
