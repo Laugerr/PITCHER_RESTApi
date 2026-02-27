@@ -32,7 +32,7 @@ class CategoryController extends Controller
 
         $category = Category::create([
             'title' => $validate['title'],
-            'description' => $validate['description'],
+            'description' => $validate['description'] ?? null,
         ]);
 
         $response = ['============New Category Created!============', $category];
