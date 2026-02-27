@@ -19,7 +19,7 @@ class Category extends Model
         "description" => "string",
     ];
 
-    public function posts() {
-        return $this->belongsToMany(Post::class);
+    public function postsQuery() {
+        return Post::where('categories', 'like', '%' . $this->title . '%');
     }
 }

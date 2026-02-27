@@ -26,8 +26,27 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function categories() {
-        return $this->belongsToMany(Category::class);
+    public function setCategoriesAttribute($value) {
+        if (is_array($value)) {
+            $values = array_filter(array_map('trim', $value), function ($item) {
+                return $item !== '';
+            });
+
+            $this->attributes['categories'] = empty($values) ? null : implode(', ', $values);
+            return;
+        }
+
+        $this->attributes['categories'] = $value;
+    }
+
+    public function getCategoryListAttribute() {
+        if (empty($this->attributes['categories'])) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('trim', explode(',', $this->attributes['categories'])), function ($item) {
+            return $item !== '';
+        }));
     }
 
     public function comments() {

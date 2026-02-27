@@ -40,14 +40,15 @@ class PostController extends Controller
         $validate = $request->validate([
             'title' => 'required|string|max:60|min:3',
             'content' => 'required|string|max:8000',
-            'categories' => 'array|exists:categories,title',
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,title',
         ]);
 
         $post = Post::create([
             'user_id' => Auth::id(),
             'title' => $validate['title'],
             'content' => $validate['content'],
-            'categories' => Implode(', ', $validate['categories']),
+            'categories' => $validate['categories'] ?? null,
         ]);
 
         $response = [
@@ -230,6 +231,7 @@ class PostController extends Controller
             'title' => 'string|max:60|min:3',
             'content' => 'string|max:8000',
             'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,title',
         ]);
 
         if($post->user_id != $user){
