@@ -1,64 +1,142 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# PITCHER REST API
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+PITCHER is a Laravel-based REST API for a social-style posting platform with:
+- authentication
+- users and profiles
+- posts and comments
+- like/dislike reactions
+- categories
 
-## About Laravel
+## Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 7.3+ / 8.x
+- Laravel 8
+- Laravel Sanctum (token auth)
+- MySQL (or compatible SQL database)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Project Modules
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- `Auth`: register, login, logout, password reset
+- `Users`: profile, user list/admin actions, online status
+- `Posts`: CRUD, comments, likes/dislikes, category filtering
+- `Comments`: CRUD, likes/dislikes
+- `Categories`: CRUD, posts by category
 
-## Learning Laravel
+## Quick Start
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Install dependencies
+```bash
+composer install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Copy env and generate app key
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Laravel Sponsors
+3. Configure database in `.env`
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=pitcher
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+4. Run migrations
+```bash
+php artisan migrate
+```
 
-### Premium Partners
+5. Start server
+```bash
+php artisan serve
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[CMS Max](https://www.cmsmax.com/)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
+Base URL (local): `http://127.0.0.1:8000/api`
 
-## Contributing
+## Authentication
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Login returns a Sanctum token:
 
-## Code of Conduct
+```http
+POST /api/auth/login
+Content-Type: application/json
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+{
+  "login": "your_login",
+  "password": "your_password"
+}
+```
 
-## Security Vulnerabilities
+Use token on protected routes:
+```http
+Authorization: Bearer <token>
+Accept: application/json
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## API Endpoints
 
-## License
+### Auth
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/logout`
+- `POST /auth/password-reset`
+- `POST /auth/password-reset/{token}`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Users
+- `GET /users/profile`
+- `GET /users` (admin)
+- `GET /users/checkstatus` (auth)
+- `GET /users/{id}` (auth)
+- `POST /users` (admin)
+- `POST /users/avatar` (auth)
+- `DELETE /users/{id}` (admin)
+
+### Posts
+- `GET /posts` (auth)
+- `GET /posts/{id}` (auth)
+- `POST /posts` (auth)
+- `PATCH /posts/{id}` (auth)
+- `DELETE /posts/{id}` (auth)
+- `POST /posts/{id}/comments` (auth)
+- `GET /posts/{id}/comments` (auth)
+- `POST /posts/{id}/like` (auth)
+- `GET /posts/{id}/like` (auth)
+- `DELETE /posts/{id}/like` (auth)
+- `GET /posts/{id}/categories` (auth)
+
+### Categories
+- `POST /categories` (auth)
+- `GET /categories` (auth)
+- `GET /categories/{id}` (auth)
+- `GET /categories/{id}/posts` (auth)
+- `PATCH /categories/{id}` (auth)
+- `DELETE /categories/{id}` (auth)
+
+### Comments
+- `GET /comments/{id}` (auth)
+- `PATCH /comments/{id}` (auth)
+- `DELETE /comments/{id}` (auth)
+- `GET /comments/{id}/like` (auth)
+- `POST /comments/{id}/like` (auth)
+- `DELETE /comments/{id}/like` (auth)
+
+## Tests
+
+Run the suite:
+```bash
+php artisan test
+```
+
+Current feature tests include:
+- auth login token behavior
+- post like/dislike transition correctness
+- category create with nullable description
+
+## Notes
+
+- API routes are defined in `routes/api.php`.
+- This repo currently stores post categories as a comma-separated string in the `posts.categories` field.
